@@ -37,7 +37,6 @@ mkdir -p ${topdir}/build
 source ${topdir}/scripts/setup.sh
 
 setup_build_tools
-setup_package_dependencies
 
 source ${topdir}/scripts/build_bsp.sh
 

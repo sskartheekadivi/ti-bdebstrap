@@ -15,21 +15,32 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y \
+              pigz expect pv \
+              binfmtc binfmt-support \
+              qemu-user qemu-user-static qemu-system-arm \
+              debian-archive-keyring bdebstrap \
+              build-essential autoconf automake \
+              bison flex libssl-dev \
+              bc u-boot-tools swig python3-pyelftools
+          sudo apt install --fix-broken
+
       - name: Build
         run: |
           mkdir -p build
           sudo ./build.sh
 
-      # Upload
-      - name: Upload artifacts
+      - name: Upload AM62x artifacts
         uses: actions/upload-artifact@v3.1.2
         with:
           path: build/*am62xx-evm*.tar.xz
           name: am62xx-evm-artifacts
           if-no-files-found: error
 
-      # Upload
-      - name: Upload artifacts
+      - name: Upload BSP Sources package
         uses: actions/upload-artifact@v3.1.2
         with:
           path: build/bsp_sources.tar.xz

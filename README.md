@@ -23,16 +23,19 @@ ti-bdebstrap
 
 Host Setup - Ubuntu 22.04 (Recommended)
 
-To install the dependencies, run the following command
+To install the dependencies, run the following commands
 
 ```bash
-apt update
-
-sudo apt-get install -y binfmtc binfmt-support pv pigz \
-            qemu-user qemu-user-static qemu-system-arm \
-            debian-archive-keyring bdebstrap
-sudo apt-get install build-essential autoconf automake \
-            bison flex libssl-dev bc u-boot-tools swig
+sudo apt update
+sudo apt install -y \
+        pigz expect pv \
+        binfmtc binfmt-support \
+        qemu-user qemu-user-static qemu-system-arm \
+        debian-archive-keyring bdebstrap \
+        build-essential autoconf automake \
+        bison flex libssl-dev \
+        bc u-boot-tools swig python3-pyelftools
+sudo apt install --fix-broken
 ```
 
 ## Usage

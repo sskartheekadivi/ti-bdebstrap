@@ -31,17 +31,3 @@ function setup_build_tools() {
     export PATH=${topdir}/tools/gcc-arm-9.2-2019.12-x86_64-aarch64-none-linux-gnu/bin:$PATH
 }
 
-function setup_package_dependencies() {
-    echo "> Package dependencies: installing .."
-    echo $passwd | sudo -S -k apt install -y \
-        pigz expect pv \
-        binfmtc binfmt-support \
-        qemu-user qemu-user-static qemu-system-arm \
-        debian-archive-keyring bdebstrap \
-        build-essential autoconf automake \
-        bison flex libssl-dev \
-        bc u-boot-tools swig
-
-    echo "> Package dependencies: installed"
-}
-
