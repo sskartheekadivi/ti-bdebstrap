@@ -37,7 +37,7 @@ mkdir -p ${topdir}/build
 source ${topdir}/scripts/setup.sh
 
 setup_build_tools
-echo $passwd | sudo -k -S setup_package_dependencies
+setup_package_dependencies
 
 source ${topdir}/scripts/build_bsp.sh
 
