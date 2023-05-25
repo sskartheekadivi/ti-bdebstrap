@@ -220,7 +220,8 @@ rootfs_dir=$2
     cp arch/arm64/boot/Image ${rootfs_dir}/boot/
 
     echo "kernel: installing DTBs .."
-    cp -rf arch/arm64/boot/dts/ti ${rootfs_dir}/boot/
+    mkdir -p ${rootfs_dir}/boot/dtb
+    cp -rf arch/arm64/boot/dts/ti ${rootfs_dir}/boot/dtb/
 
     echo "kernel: installing modules .."
     make ARCH=arm64  INSTALL_MOD_PATH=${rootfs_dir} modules_install
