@@ -34,7 +34,8 @@ sudo apt install -y \
         debian-archive-keyring bdebstrap \
         build-essential autoconf automake \
         bison flex libssl-dev \
-        bc u-boot-tools swig python3-pyelftools
+        bc u-boot-tools swig python3-pyelftools \
+        gcc-aarch64-linux-gnu
 sudo apt install --fix-broken
 ```
 
