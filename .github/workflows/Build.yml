@@ -38,7 +38,7 @@ jobs:
       - name: Upload AM62x artifacts
         uses: actions/upload-artifact@v3.1.2
         with:
-          path: build/*am62xx-evm*.tar.xz
+          path: build/*am62xx-evm*
           name: am62xx-evm-artifacts
           if-no-files-found: error
 
