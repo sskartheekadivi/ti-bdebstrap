@@ -205,7 +205,12 @@ rootfs_dir=$2
     cd ${KERNEL_DIR}
 
     echo "kernel: generating defconfig .."
-    make -j`nproc` ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- defconfig ti_arm64_prune.config
+    # make -j`nproc` ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- defconfig ti_arm64_prune.config
+    ti_config_fragments/defconfig_builder.sh -t ti_sdk_arm64_release
+    export ARCH=arm64
+    make ti_sdk_arm64_release_defconfig
+    mv .config arch/arm64/configs/tisdk_${machine}_defconfig
+    make ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- tisdk_${machine}_defconfig
 
     echo "kernel: building Image .."
     make -j`nproc` ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- Image
@@ -221,7 +226,7 @@ rootfs_dir=$2
 
     echo "kernel: installing DTBs .."
     mkdir -p ${rootfs_dir}/boot/dtb
-    cp -rf arch/arm64/boot/dts/ti ${rootfs_dir}/boot/dtb/
+    cp -rf arch/arm64/boot/dts/ti/* ${rootfs_dir}/boot/
 
     echo "kernel: installing modules .."
     make ARCH=arm64  INSTALL_MOD_PATH=${rootfs_dir} modules_install
@@ -237,10 +242,10 @@ kernel_dir=$3
     cd ${IMG_ROGUE_DRIVER_DIR}
 
     echo "ti-img-rogue-driver: building .."
-    make CROSS_COMPILE=aarch64-linux-gnu- ARCH=arm64 KERNELDIR=${kernel_dir} RGX_BVNC="33.15.11.3" BUILD=release PVR_BUILD_DIR=${pvr_target} WINDOW_SYSTEM=${pvr_window_system}
+    make CROSS_COMPILE=aarch64-none-linux-gnu- ARCH=arm64 KERNELDIR=${kernel_dir} BUILD=release PVR_BUILD_DIR=${pvr_target} WINDOW_SYSTEM=${pvr_window_system}
 
     echo "ti-img-rogue-driver: installing .."
     cd binary_am62_linux_wayland_release/target_aarch64/kbuild
-    make -C ${kernel_dir} ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- INSTALL_MOD_PATH=${rootfs_dir} INSTALL_MOD_STRIP=1 M=`pwd` modules_install
+    make -C ${kernel_dir} ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- INSTALL_MOD_PATH=${rootfs_dir} INSTALL_MOD_STRIP=1 M=`pwd` modules_install
 
 }
