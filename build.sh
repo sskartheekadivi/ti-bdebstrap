@@ -79,11 +79,18 @@ do
         export ROOTFS_DIR=${topdir}/build/${distro}-${machine}-rootfs
         build_kernel ${machine} ${ROOTFS_DIR}
         build_ti_img_rogue_driver ${machine} ${ROOTFS_DIR} ${KERNEL_DIR}
+        umount ${topdir}/build/metadata-${distro}-${machine}/${distro}-${machine}-rootfs/*
+        umount ${topdir}/build/metadata-${distro}-${machine}/${distro}-${machine}-rootfs/dev/*
+        umount ${topdir}/build/metadata-${distro}-${machine}/${distro}-${machine}-rootfs/*
+        umount ${topdir}/build/metadata-${distro}-${machine}/${distro}-${machine}-rootfs/dev/*
+        tar --use-compress-program="pigz --best --recursive | pv" -cf ${distro}-${machine}-rootfs.tar.xz ${distro}-${machine}-rootfs
     done
 done
 
 echo "> Cleaning up .."
 cd ${topdir}/build
 rm -rf metadata-${distro}-${machine}
+rm -rf ${distro}-${machine}-rootfs
+rm -rf boot_${machine}
 rm -rf bsp_sources
 
