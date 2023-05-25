@@ -43,6 +43,7 @@ source ${topdir}/scripts/build_bsp.sh
 
 for machine in "${machines[@]}"
 do
+    echo "info: nproc = `nproc`"
     setup_bsp_build $machine
     build_atf $machine
     build_optee $machine
@@ -70,19 +71,25 @@ do
 
         cd ${topdir}/build
         echo ">> mmdebstrap has issues with unmounting /proc and /dev/pts, etc. Umounting them manually .."
-        umount ${topdir}/build/metadata-${distro}-${machine}/${distro}-${machine}-rootfs/*
-        umount ${topdir}/build/metadata-${distro}-${machine}/${distro}-${machine}-rootfs/dev/*
-        umount ${topdir}/build/metadata-${distro}-${machine}/${distro}-${machine}-rootfs/*
-        umount ${topdir}/build/metadata-${distro}-${machine}/${distro}-${machine}-rootfs/dev/*
-        mv ${topdir}/build/metadata-${distro}-${machine}/${distro}-${machine}-rootfs ${topdir}/build/
-        tar --use-compress-program="pigz --best --recursive | pv" -cf metadata-${distro}-${machine}.tar.xz metadata-${distro}-${machine}
+        umount ./metadata-${distro}-${machine}/${distro}-${machine}-rootfs/*
+        umount ./metadata-${distro}-${machine}/${distro}-${machine}-rootfs/dev/*
+        umount ./metadata-${distro}-${machine}/${distro}-${machine}-rootfs/*
+        umount ./metadata-${distro}-${machine}/${distro}-${machine}-rootfs/dev/*
+
+        mv ./metadata-${distro}-${machine}/${distro}-${machine}-rootfs ${topdir}/build/
         export ROOTFS_DIR=${topdir}/build/${distro}-${machine}-rootfs
+
+        tar --use-compress-program="pigz --best --recursive | pv" -cf metadata-${distro}-${machine}.tar.xz metadata-${distro}-${machine}
+
         build_kernel ${machine} ${ROOTFS_DIR}
         build_ti_img_rogue_driver ${machine} ${ROOTFS_DIR} ${KERNEL_DIR}
-        umount ${topdir}/build/metadata-${distro}-${machine}/${distro}-${machine}-rootfs/*
-        umount ${topdir}/build/metadata-${distro}-${machine}/${distro}-${machine}-rootfs/dev/*
-        umount ${topdir}/build/metadata-${distro}-${machine}/${distro}-${machine}-rootfs/*
-        umount ${topdir}/build/metadata-${distro}-${machine}/${distro}-${machine}-rootfs/dev/*
+
+        cd ${topdir}/build
+
+        umount ${distro}-${machine}-rootfs/*
+        umount ${distro}-${machine}-rootfs/dev/*
+        umount ${distro}-${machine}-rootfs/*
+        umount ${distro}-${machine}-rootfs/dev/*
         tar --use-compress-program="pigz --best --recursive | pv" -cf ${distro}-${machine}-rootfs.tar.xz ${distro}-${machine}-rootfs
     done
 done

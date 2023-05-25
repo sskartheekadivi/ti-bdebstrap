@@ -165,7 +165,7 @@ machine=$1
     make -j`nproc` CROSS_COMPILE64=aarch64-none-linux-gnu- CROSS_COMPILE=arm-none-linux-gnueabihf- PLATFORM=${platform} CFG_ARM64_core=y
 
     echo "> optee: signing .."
-    ${TI_SECURE_DEV_PKG}/scripts/secure-binary-image.sh ./out/arm-plat-k3/core/tee-pager_v2.bin ./out/arm-plat-k3/core/tee-pager_v2.bin.signed
+    ${TI_SECURE_DEV_PKG}/scripts/secure-binary-image.sh ${OPTEE_DIR}/out/arm-plat-k3/core/tee-pager_v2.bin ${OPTEE_DIR}/out/arm-plat-k3/core/tee-pager_v2.bin.signed
 }
 
 function build_uboot() {
