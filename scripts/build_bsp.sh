@@ -149,8 +149,12 @@ machine=$1
     target_board=($(read_machine_config ${machine} atf_target_board))
 
     log "> ATF: building .."
-    make -j`nproc` ARCH=aarch64 CROSS_COMPILE=aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=${target_board} SPD=opteed &>>"${LOG_FILE}"
-
+    if [ ${machine} = "j721s2-evm" ] || [ ${machine} = "j784s4-evm" ]; then
+        make -j`nproc` ARCH=aarch64 CROSS_COMPILE=aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=${target_board} SPD=opteed K3_USART=0x8 &>>"${LOG_FILE}"
+    else
+        make -j`nproc` ARCH=aarch64 CROSS_COMPILE=aarch64-none-linux-gnu- PLAT=k3 TARGET_BOARD=${target_board} SPD=opteed &>>"${LOG_FILE}"
+    fi 
+    
     log "> ATF: signing .."
 }
 
@@ -186,11 +190,21 @@ machine=$1
     # make -j`nproc` ARCH=arm CROSS_COMPILE=arm-none-linux-gnueabihf- SOC=${sysfw_soc} SOC_TYPE=hs SBL=${UBOOT_DIR}/out/r5/spl/u-boot-spl.bin SYSFW_DIR=${SYSFW_DIR}
 
     cd ${UBOOT_DIR}
-    log "> uboot-a53: building .."
-    make -j`nproc` ARCH=arm CROSS_COMPILE=aarch64-none-linux-gnu- ${uboot_a53_defconfig} O=${UBOOT_DIR}/out/a53 &>>"${LOG_FILE}"
-    make -j`nproc` ARCH=arm CROSS_COMPILE=aarch64-none-linux-gnu- BL31=${TFA_DIR}/build/k3/lite/release/bl31.bin TEE=${OPTEE_DIR}/out/arm-plat-k3/core/tee-pager_v2.bin O=${UBOOT_DIR}/out/a53 BINMAN_INDIRS=${topdir}/build/${build}/bsp_sources/ti-linux-firmware &>>"${LOG_FILE}"
-    cp ${UBOOT_DIR}/out/a53/tispl.bin ${topdir}/build/${build}/tisdk-${distro}-${machine}-boot/ &>> ${LOG_FILE}
-    cp ${UBOOT_DIR}/out/a53/u-boot.img ${topdir}/build/${build}/tisdk-${distro}-${machine}-boot/ &>> ${LOG_FILE}
+    if [ ${machine} = "j721s2-evm" ] || [ ${machine} = "j784s4-evm" ]; then
+        log "> uboot-a72: building .."
+        make -j`nproc` ARCH=arm CROSS_COMPILE=aarch64-none-linux-gnu- ${uboot_a72_defconfig} O=${UBOOT_DIR}/out/a72 &>>"${LOG_FILE}"
+        make -j`nproc` ARCH=arm CROSS_COMPILE=aarch64-none-linux-gnu- BL31=${TFA_DIR}/build/k3/generic/release/bl31.bin TEE=${OPTEE_DIR}/out/arm-plat-k3/core/tee-pager_v2.bin O=${UBOOT_DIR}/out/a72 BINMAN_INDIRS=${topdir}/build/${build}/bsp_sources/ti-linux-firmware &>>"${LOG_FILE}"
+        cp ${UBOOT_DIR}/out/a72/tispl.bin ${topdir}/build/${build}/tisdk-${distro}-${machine}-boot/ &>> ${LOG_FILE}
+        cp ${UBOOT_DIR}/out/a72/u-boot.img ${topdir}/build/${build}/tisdk-${distro}-${machine}-boot/ &>> ${LOG_FILE}
+    else    
+        log "> uboot-a53: building .."
+        make -j`nproc` ARCH=arm CROSS_COMPILE=aarch64-none-linux-gnu- ${uboot_a53_defconfig} O=${UBOOT_DIR}/out/a53 &>>"${LOG_FILE}"
+        make -j`nproc` ARCH=arm CROSS_COMPILE=aarch64-none-linux-gnu- BL31=${TFA_DIR}/build/k3/lite/release/bl31.bin TEE=${OPTEE_DIR}/out/arm-plat-k3/core/tee-pager_v2.bin O=${UBOOT_DIR}/out/a53 BINMAN_INDIRS=${topdir}/build/${build}/bsp_sources/ti-linux-firmware &>>"${LOG_FILE}"
+        cp ${UBOOT_DIR}/out/a53/tispl.bin ${topdir}/build/${build}/tisdk-${distro}-${machine}-boot/ &>> ${LOG_FILE}
+        cp ${UBOOT_DIR}/out/a53/u-boot.img ${topdir}/build/${build}/tisdk-${distro}-${machine}-boot/ &>> ${LOG_FILE}
+    fi
+    
+
 }
 
 function build_kernel() {
@@ -235,6 +249,11 @@ kernel_dir=$3
     make CROSS_COMPILE=aarch64-none-linux-gnu- ARCH=arm64 KERNELDIR=${kernel_dir} RGX_BVNC="33.15.11.3" BUILD=release PVR_BUILD_DIR=${pvr_target} WINDOW_SYSTEM=${pvr_window_system} &>>"${LOG_FILE}"
 
     log "ti-img-rogue-driver: installing .."
-    cd binary_am62_linux_wayland_release/target_aarch64/kbuild
-    make -C ${kernel_dir} ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- INSTALL_MOD_PATH=${rootfs_dir} INSTALL_MOD_STRIP=1 M=`pwd` modules_install &>>"${LOG_FILE}"
+    if [ ${machine} = "j721s2-evm" ]; then
+        cd binary_j721s2_linux_wayland_release/target_aarch64/kbuild
+        make -C ${kernel_dir} ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- INSTALL_MOD_PATH=${rootfs_dir} INSTALL_MOD_STRIP=1 M=`pwd` modules_install &>>"${LOG_FILE}"
+    else 
+        cd binary_am62_linux_wayland_release/target_aarch64/kbuild
+        make -C ${kernel_dir} ARCH=arm64 CROSS_COMPILE=aarch64-none-linux-gnu- INSTALL_MOD_PATH=${rootfs_dir} INSTALL_MOD_STRIP=1 M=`pwd` modules_install &>>"${LOG_FILE}"
+    fi 
 }
